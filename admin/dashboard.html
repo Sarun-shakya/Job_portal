@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial;
+}
+
+body{
+    background: #f5f7fb;
+}
+
+/* Main container layout */
+.container{
+    display: flex;
+}
+
+/* Sidebar */
+.sidebar{
+    width: 260px;
+    background: #0f172a;
+    color: white;
+    height: 100vh;
+    padding: 20px;
+    position: fixed;
+}
+
+.sidebar h2{
+    font-size: 20px; 
+}
+
+.sub{
+    font-size: 12px;
+    opacity: 0.7;
+    margin-bottom: 20px;
+}
+
+.menu{
+    list-style: none;
+}
+
+.menu li{
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.menu .title{
+    font-size: 12px;
+    opacity: 0.5;
+    margin-top: 20px;
+}
+
+/* Main content */
+.main{
+    margin-left: 260px;
+    padding: 20px;
+    width: 100%;
+}
+
+.topbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search{
+    width: 350px;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+}
+
+.user-box{
+    font-weight: bold;
+}
+
+.heading{
+    font-size: 30px;
+    margin-top: 20px;
+}
+
+.welcome{
+    opacity: 0.6;
+    margin-bottom: 20px;
+}
+
+/* Cards */
+.cards{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.card{
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card h3{
+    font-size: 28px;
+}
+
+.card p{
+    opacity: 0.6;
+}
+
+/* Tables */
+.tables-wrapper{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 30px;
+    gap: 20px;
+}
+
+.table-box{
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.table-header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.view-btn{
+    padding: 7px 15px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td{
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Everest Tech Nepal</h2>
+        <p class="sub">Admin Panel</p>
+
+        <ul class="menu">
+            <li class="title">MAIN</li>
+            <li>Dashboard</li>
+
+            <li class="title">CONTENT MANAGEMENT</li>
+            <li>Smartphones</li>
+            <li>Add Smartphone</li>
+            <li>Brands</li>
+            <li>News Articles</li>
+            <li>Write Article</li>
+            <li>Comparisons</li>
+
+            <li class="title">ENGAGEMENT</li>
+            <li>Comments</li>
+            <li>Subscribers</li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <!-- Top Navbar -->
+        <header class="topbar">
+            <input type="text" placeholder="Search..." class="search">
+            <div class="user-box">
+                <span class="user-name">Admin User</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <h1 class="heading">Dashboard</h1>
+        <p class="welcome">Welcome back, Admin User!</p>
+
+        <!-- Cards -->
+        <div class="cards">
+            <div class="card">
+                <h3>2</h3>
+                <p>Total Smartphones</p>
+            </div>
+
+            <div class="card">
+                <h3>0</h3>
+                <p>Published Articles</p>
+            </div>
+
+            <div class="card">
+                <h3>0</h3>
+                <p>Pending Comments</p>
+            </div>
+
+            <div class="card">
+                <h3>2</h3>
+                <p>Newsletter Subscribers</p>
+            </div>
+        </div>
+
+        <!-- Table Wrapper -->
+        <div class="tables-wrapper">
+
+            <!-- Recent Smartphones -->
+            <div class="table-box">
+                <div class="table-header">
+                    <h3>Recent Smartphones</h3>
+                    <button class="view-btn">View All</button>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>Brand</th>
+                        <th>Model</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    <tr>
+                        <td>OnePlus</td>
+                        <td>16wsyd</td>
+                        <td>Rs. 9,99,999</td>
+                        <td>Active</td>
+                        <td>Edit | Delete</td>
+                    </tr>
+                    <tr>
+                        <td>Apple</td>
+                        <td>Iphone 17 Pro Max</td>
+                        <td>Rs. 239,999</td>
+                        <td>Active</td>
+                        <td>Edit | Delete</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Recent News -->
+            <div class="table-box">
+                <div class="table-header">
+                    <h3>Recent News</h3>
+                    <button class="view-btn">View All</button>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Views</th>
+                        <th>Actions</th>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

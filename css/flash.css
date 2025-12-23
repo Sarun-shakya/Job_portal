@@ -1,0 +1,27 @@
+ .flash-message {
+     position: fixed;
+     top: -60px;
+     left: 50%;
+     transform: translateX(-50%);
+     background-color: white;
+     color: black;
+     padding: 0.5rem 1rem;
+     border-radius: 5px;
+     font-weight: 600;
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+     z-index: 10000;
+     opacity: 0;
+     pointer-events: none;
+     transition: top 0.5s ease, opacity 0.5s ease;
+ }
+
+ .flash-message.show {
+     top: 20px;
+     opacity: 1;
+     pointer-events: auto;
+ }
+
+ .flash-message.hide {
+     top: -60px;
+     opacity: 0;
+ }

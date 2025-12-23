@@ -1,0 +1,274 @@
+/* General body and container */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.description {
+    max-width: 1300px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px 40px;
+}
+
+/* Back button */
+.back-button a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: #555;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.back-button a:hover {
+    color: #0d6efd;
+}
+
+/* Description card */
+.description-card {
+    background: #e9f0ff;
+    border-radius: 12px;
+    padding: 25px 30px;
+    margin-top: 20px;
+    box-shadow: inset 0 0 15px rgba(13, 110, 253, 0.1);
+}
+
+/* Row 1: logo, title, bookmark */
+.description-row1 {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+}
+
+.description-row1 img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: white;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.description-title h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #0d6efd;
+    font-weight: 700;
+}
+
+.description-title p {
+    margin: 4px 0 0 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Bookmark icon */
+.bookmark {
+    margin-left: auto;
+    font-size: 1.8rem;
+    color: #0d6efd;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.bookmark:hover {
+    color: #ff6b6b;
+}
+
+/* Row 2: job info and apply button */
+.description-row2 {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.description-row2>div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #444;
+    font-size: 1rem;
+}
+
+.description-row2 i {
+    color: #0d6efd;
+    font-size: 1.3rem;
+}
+
+/* Apply button */
+.description-row2 button {
+    margin-left: auto;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+}
+
+.description-row2 button:hover {
+    background: #084cd9;
+}
+
+/* Main description layout */
+.main-description {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    max-width: 1300px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+/* Job details text
+.job-details {
+    flex: 3;
+    font-size: 1.1rem;
+    line-height: 1.3;
+    color: #444;
+    background: #f9fbff;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.1);
+} */
+ /* Job details text */
+.job-details {
+    flex: 3;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #444;
+    background: #f9fbff;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.1);
+}
+
+/* Headings inside job details */
+.job-details p strong, .job-details h2 span {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+    color: #0d6efd;
+    border-left: 4px solid #0d6efd;
+    padding-left: 10px;
+    font-weight: 600;
+}
+
+/* Lists inside job details */
+.job-details ul {
+    margin: 0 0 20px 0;
+    padding-left: 20px;
+    list-style: none; /* remove default bullets */
+}
+
+.job-details ul li {
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+/* Custom bullet for list items */
+.job-details ul li::before {
+    content: "✔";  
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #9b59b6;
+    font-weight: bold;
+}
+
+
+/* Job overview */
+.job-overview {
+    flex: 1 1 0;
+    background: #eee1ff;
+    border-radius: 12px;
+    padding: 25px 30px;
+    box-shadow: 0 4px 10px #eee1ff;
+    min-width: 280px;
+    height: fit-content;
+    margin-left: auto;
+}
+
+.job-overview h5 {
+    margin-top: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-bottom: 2px solid rgba(76, 74, 74, 0.3);
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+}
+
+
+.jd-title .title-label {
+    font-size: 1.1rem;
+    color: #9b59b6;
+    margin-top: 20px;
+    font-weight: 500;
+}
+
+.jd-title .title-label i{
+    font-size: 1.3rem;
+}
+
+.jd-title p {
+    margin: 2px 0 0 27px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+
+@media (max-width: 900px) {
+    .main-description {
+        flex-direction: column;
+    }
+
+    /* Make job-overview appear first */
+    .job-overview {
+        order: -1;
+    }
+
+    .job-details,
+    .job-overview {
+        width: 100%;
+        max-height: none;
+    }
+
+    .description-row2 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .description-row2 button {
+        margin-left: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    .description-title h2 {
+        font-size: 1.4rem;
+    }
+    .bookmark {
+        font-size: 1.5rem;
+    }
+}
+

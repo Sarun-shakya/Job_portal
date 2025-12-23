@@ -1,0 +1,409 @@
+<?php
+include __DIR__ . '/../../config/db.php';
+
+// Get job ID from GET parameter
+$jobId = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+// Fetch job details
+$job = null;
+if ($jobId > 0) {
+    $sql = "SELECT * FROM jobs WHERE job_id = $jobId";
+    $result = mysqli_query($conn, $sql);
+    $job = mysqli_fetch_assoc($result);
+}
+
+if (!$job) {
+    echo "<p style='color:red; text-align:center'>Job not found.</p>";
+    exit;
+}
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == 'POST') {
+    $title = mysqli_real_escape_string($conn, $_POST["title"]);
+    $location = mysqli_real_escape_string($conn, $_POST["location"]);
+    $description = mysqli_real_escape_string($conn, $_POST["description"]);
+    $minExperience = mysqli_real_escape_string($conn, $_POST["experience_min"]);
+    $maxExperience = mysqli_real_escape_string($conn, $_POST["experience_max"]);
+    $degree = mysqli_real_escape_string($conn, $_POST["degree"]);
+    $expiryDate = mysqli_real_escape_string($conn, $_POST["expiry_date"]);
+    $category = mysqli_real_escape_string($conn, $_POST["category"]);
+    $jobType = mysqli_real_escape_string($conn, $_POST["job_type"]);
+    $jobLevel = mysqli_real_escape_string($conn, $_POST["job_level"]);
+    $minSalary = mysqli_real_escape_string($conn, $_POST["salary_min"]);
+    $maxSalary = mysqli_real_escape_string($conn, $_POST["salary_max"]);
+
+    $sql = "UPDATE jobs SET 
+        title='$title', description='$description', location='$location', 
+        salary_min='$minSalary', salary_max='$maxSalary', 
+        experience_min='$minExperience', experience_max='$maxExperience', 
+        expiry_date='$expiryDate', degree='$degree', 
+        job_type='$jobType', job_level='$jobLevel', category='$category'
+        WHERE job_id=$jobId";
+
+    if (mysqli_query($conn, $sql)) {
+        echo "<p style='color:green; text-align:center'>Job Updated Successfully</p>";
+        // Refresh job data
+        $result = mysqli_query($conn, "SELECT * FROM jobs WHERE job_id = $jobId");
+        $job = mysqli_fetch_assoc($result);
+    } else {
+        echo "<p style='color:red; text-align:center'>Error updating job: " . mysqli_error($conn) . "</p>";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Job</title>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+<link rel="stylesheet" href="../css/emp-dashboard.css">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<style>
+    .form-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .title-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .title h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .title p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .preview {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #dfdfdfff;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .preview i {
+            font-size: 1.2rem;
+        }
+
+        .form-container form {
+            padding-top: 0.8rem;
+            /* ↓ reduced from 2rem */
+        }
+
+
+        form {
+            padding: 2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+        }
+
+        input[type="text"]::placeholder {
+            color: #999;
+        }
+
+        .form-container form .btn {
+            display: block;
+            text-align: center;
+            color: white;
+            width: 200px;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background-color: #667eea;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin: auto;
+        }
+
+        .form-container form .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Quill Editor Styles */
+        #toolbar {
+            margin-bottom: 1rem;
+            border: none;
+            background: transparent;
+        }
+
+        #editor {
+            min-height: 200px;
+            margin-bottom: 1.5rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+
+        #editor:focus-within {
+            border-color: #007bff;
+            box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+        }
+
+        .ql-container {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .ql-toolbar {
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 8px 8px 0 0;
+            background: #f8f9fa;
+            padding: 0.75rem;
+        }
+
+        .ql-toolbar .ql-formats {
+            margin-right: 0.5rem;
+        }
+
+        .ql-toolbar button {
+            border: none;
+            background: transparent;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+
+        .ql-toolbar button:hover {
+            color: #667eea;
+        }
+
+        .ql-toolbar button.ql-active {
+            color: #667eea;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .form-container {
+                margin: 1rem;
+                padding: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .title-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1.5rem;
+            }
+
+            .preview {
+                align-self: flex-end;
+            }
+
+            form {
+                padding: 1.5rem;
+            }
+
+            .title h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            form {
+                padding: 1rem;
+            }
+
+            input[type="text"],
+            input[type="date"],
+            select {
+                padding: 0.625rem 0.875rem;
+                margin-bottom: 1.25rem;
+            }
+
+            #editor {
+                min-height: 150px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-container {
+            animation: fadeIn 0.6s ease-out;
+        }
+</style>
+</head>
+<body>
+
+<div class="form-container">
+    <div class="title-card">
+        <div class="title">
+            <h2>Edit Job</h2>
+            <p>Update the job details below</p>
+        </div>
+    </div>
+
+    <form id="jobForm" method="POST">
+        <label for="title">Job Title</label>
+        <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($job['title']); ?>" required>
+
+        <label for="location">Location</label>
+        <input type="text" name="location" id="location" value="<?php echo htmlspecialchars($job['location']); ?>" required>
+
+        <label for="description">Job Description</label>
+        <div id="toolbar">
+            <span class="ql-formats">
+                <button class="ql-bold"></button>
+                <button class="ql-italic"></button>
+                <button class="ql-underline"></button>
+            </span>
+            <span class="ql-formats">
+                <select class="ql-size">
+                    <option value="small">Small</option>
+                    <option selected value="">Normal</option>
+                    <option value="large">Large</option>
+                    <option value="huge">Huge</option>
+                </select>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-list" value="ordered"></button>
+                <button class="ql-list" value="bullet"></button>
+            </span>
+        </div>
+        <div id="editor"><?php echo $job['description']; ?></div>
+        <input type="hidden" name="description" id="description">
+
+        <label for="min-experience">Minimum Experience</label>
+        <input type="text" id="min-experience" name="experience_min" value="<?php echo $job['experience_min']; ?>">
+
+        <label for="max-experience">Maximum Experience</label>
+        <input type="text" id="max-experience" name="experience_max" value="<?php echo $job['experience_max']; ?>">
+
+        <label for="degree">Degree</label>
+        <input type="text" name="degree" id="degree" value="<?php echo $job['degree']; ?>">
+
+        <label for="expiry-date">Expiry Date</label>
+        <input type="date" name="expiry_date" id="expiry-date" value="<?php echo $job['expiry_date']; ?>" required>
+
+        <label for="category">Job Category</label>
+        <select id="category" name="category" required>
+            <option value="it_software" <?php if($job['category']=='it_software') echo 'selected'; ?>>IT & Software</option>
+            <option value="web_dev" <?php if($job['category']=='web_dev') echo 'selected'; ?>>Web Development</option>
+            <option value="design" <?php if($job['category']=='design') echo 'selected'; ?>>Design & Creative</option>
+            <option value="marketing" <?php if($job['category']=='marketing') echo 'selected'; ?>>Marketing & Sales</option>
+            <option value="finance" <?php if($job['category']=='finance') echo 'selected'; ?>>Finance & Accounting</option>
+            <option value="hr" <?php if($job['category']=='hr') echo 'selected'; ?>>Human Resources</option>
+            <option value="education" <?php if($job['category']=='education') echo 'selected'; ?>>Education & Training</option>
+            <option value="healthcare" <?php if($job['category']=='healthcare') echo 'selected'; ?>>Healthcare</option>
+            <option value="engineering" <?php if($job['category']=='engineering') echo 'selected'; ?>>Engineering</option>
+            <option value="customer_service" <?php if($job['category']=='customer_service') echo 'selected'; ?>>Customer Service</option>
+            <option value="management" <?php if($job['category']=='management') echo 'selected'; ?>>Management</option>
+            <option value="writing" <?php if($job['category']=='writing') echo 'selected'; ?>>Writing & Translation</option>
+            <option value="data_entry" <?php if($job['category']=='data_entry') echo 'selected'; ?>>Data Entry</option>
+            <option value="legal" <?php if($job['category']=='legal') echo 'selected'; ?>>Legal</option>
+            <option value="others" <?php if($job['category']=='others') echo 'selected'; ?>>Others</option>
+        </select>
+
+        <label for="job-type">Job Type</label>
+        <select name="job_type" id="job_type" required>
+            <option value="Full time" <?php if($job['job_type']=='Full time') echo 'selected'; ?>>Full time</option>
+            <option value="Part time" <?php if($job['job_type']=='Part time') echo 'selected'; ?>>Part time</option>
+            <option value="Internship" <?php if($job['job_type']=='Internship') echo 'selected'; ?>>Internship</option>
+            <option value="Remote" <?php if($job['job_type']=='Remote') echo 'selected'; ?>>Remote</option>
+            <option value="Contract" <?php if($job['job_type']=='Contract') echo 'selected'; ?>>Contract</option>
+        </select>
+
+        <label for="job-level">Job Level</label>
+        <select name="job_level" id="job_level" required>
+            <option value="Entry" <?php if($job['job_level']=='Entry') echo 'selected'; ?>>Entry level</option>
+            <option value="Junior" <?php if($job['job_level']=='Junior') echo 'selected'; ?>>Junior level</option>
+            <option value="Mid" <?php if($job['job_level']=='Mid') echo 'selected'; ?>>Mid level</option>
+            <option value="Senior" <?php if($job['job_level']=='Senior') echo 'selected'; ?>>Senior level</option>
+        </select>
+
+        <label for="min-salary">Minimum Salary</label>
+        <input type="text" name="salary_min" id="min-salary" value="<?php echo $job['salary_min']; ?>">
+
+        <label for="max-salary">Maximum Salary</label>
+        <input type="text" name="salary_max" id="max-salary" value="<?php echo $job['salary_max']; ?>">
+
+        <button type="submit" class="btn btn-primary btn-lg">Update Job</button>
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('jobForm');
+    const quill = new Quill('#editor', {
+        modules: { toolbar: '#toolbar' },
+        placeholder: "Enter job description here...",
+        theme: "snow"
+    });
+
+    // Fill Quill editor with existing content
+    quill.root.innerHTML = `<?php echo addslashes($job['description']); ?>`;
+
+    form.addEventListener('submit', function(e) {
+        document.getElementById('description').value = quill.root.innerHTML;
+    });
+</script>
+
+</body>
+</html>
