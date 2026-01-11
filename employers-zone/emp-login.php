@@ -2,19 +2,32 @@
 session_start();
 include '../config/db.php';
 
-$error = "";
+$errors = [];
 
-// Process login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
 
-    if (!$email || !$password) {
-        $error = "Please fill all fields!";
-    } else {
-        // Fetch employer
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+
+    if (empty($email)) {
+        $errors['email'] = "Email is required";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = "Invalid email format";
+    }
+
+    if (empty($password)) {
+        $errors['password'] = "Password is required";
+    } elseif (strlen($password) < 8) {
+        $errors['password'] = "Password must be at least 8 characters";
+    }
+
+    if (empty($errors)) {
+
         $stmt = $conn->prepare("SELECT * FROM employers WHERE email = ?");
-        if ($stmt) {
+        if (!$stmt) {
+            $errors['db'] = "Database error: " . $conn->error;
+        } else {
+
             $stmt->bind_param("s", $email);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -22,39 +35,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($result->num_rows === 1) {
                 $employer = $result->fetch_assoc();
 
-                if (password_verify($password, $employer['password'])) {
-                    // Set session variables
-                    // Set employer session variables
+                if ($employer['status'] !== 'active') {
+                    $errors['status'] = "Your account is not active. Please contact admin.";
+                } elseif (!password_verify($password, $employer['password'])) {
+                    $errors['password'] = "Invalid password!";
+                } else {
+                    // Login success
+                    session_regenerate_id(true);
+
                     $_SESSION['EMPLOYER_ID'] = $employer['id'];
                     $_SESSION['EMPLOYER_NAME'] = $employer['full_name'];
                     $_SESSION['EMPLOYER_LOGGED_IN'] = true;
                     $_SESSION['EMPLOYER_LOGO'] = $employer['logo'] ?? null;
-                    // Optional flash message
                     $_SESSION['success_msg'] = "✅ Logged in successfully";
-
-
-                    // Optional: remember me cookie
-                    if (isset($_POST['remember'])) {
-                        setcookie('EMPLOYER_ID', $employer['id'], time() + 30 * 24 * 60 * 60, "/");
-                    }
-
 
                     header("Location: emp-dashboard.php");
                     exit;
-                } else {
-                    $error = "Invalid password!";
                 }
             } else {
-                $error = "Employer not found!";
+                $errors['email'] = "Employer not found!";
             }
 
             $stmt->close();
-        } else {
-            $error = "Database error: " . $conn->error;
         }
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -85,15 +92,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p>Login to find your next great hire</p>
             </div>
             <div class="login-form">
-                <?php if ($error) : ?>
-                    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                <?php if (!empty($errors)) : ?>
+                    <div class="alert alert-danger">
+                        <?php foreach ($errors as $err): ?>
+                            <div><?= htmlspecialchars($err) ?></div>
+                        <?php endforeach; ?>
+                    </div>
                 <?php endif; ?>
+
                 <form action="" method="POST">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" >
 
                     <label for="pwd">Password</label>
-                    <input type="password" id="pwd" name="password" placeholder="Enter your password" required>
+                    <input type="password" id="pwd" name="password" placeholder="Enter your password" >
 
                     <div class="login-options">
                         <a href="#" class="forgot-password">Forgot Password?</a>

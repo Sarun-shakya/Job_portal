@@ -134,7 +134,7 @@ if (isset($_POST['register'])) {
                 <input type="file" id="profile-pic" class="form-control" name="profile" accept="image/png, image/jpeg">
                 <label for="profile-pic">Resume (Optional)</label>
                 <input type="file" id="resume" class="form-control" name="resume" accept=".pdf, .doc, .docx">
-                <input type="checkbox" id="TermsAndConditions" required>
+                <input type="checkbox" id="TermsAndConditions" >
                 <label for="TermsAndConditions">I agree with the terms and conditions of JobPortal</label>
                 <button type="submit" name="register">Register</button>
             </form>
