@@ -46,9 +46,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <a href="jobs.php" class="nav-item <?= $current_page === 'jobs.php' ? 'active' : '' ?>">
                     <span class="icon"><i class="ri-briefcase-line"></i></span> Jobs
                 </a>
-                <a href="applications.php" class="nav-item <?= $current_page === 'applications.php' ? 'active' : '' ?>">
+                <!-- <a href="applications.php" class="nav-item <?= $current_page === 'applications.php' ? 'active' : '' ?>">
                     <span class="icon"><i class="ri-file-list-line"></i> </span> Applications
-                </a>
+                </a> -->
                 <a href="settings.php" class="nav-item <?= $current_page === 'settings.php' ? 'active' : '' ?>">
                     <span class="icon"><i class="ri-settings-3-line"></i></span> Settings
                 </a>
