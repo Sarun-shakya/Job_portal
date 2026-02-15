@@ -40,8 +40,8 @@
       <div class="nav-links">
         <ul>
           <li><a href="emp-home.php">Home</a></li>
-          <li><a href="#">Why us?</a></li>
-          <li><a href="#">Pricing/Plans</a></li>
+          <li><a href="emp-whyus.php">Why us?</a></li>
+          <li><a href="emp-pricing.php">Pricing/Plans</a></li>
         </ul>
       </div>
       <div class="login">

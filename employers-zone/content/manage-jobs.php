@@ -520,13 +520,13 @@
                 <h2>Edit Job</h2>
                 <span class="close-btn" onclick="closeEdit()">&times;</span>
             </div>
-
+    <div id="editJobMessages" style="margin-bottom: 15px;"></div>
             <form action="actions/update-job.php" method="POST" id="editJobForm">
                 <input type="hidden" name="job_id" id="edit_job_id">
 
                 <div class="form-group">
                     <label for="edit_title">Job Title</label>
-                    <input type="text" name="title" id="edit_title" required>
+                    <input type="text" name="title" id="edit_title" >
                 </div>
 
                 <div class="form-group">
@@ -538,7 +538,7 @@
 
                 <div class="form-group">
                     <label for="edit_location">Location</label>
-                    <input type="text" name="location" id="edit_location" required>
+                    <input type="text" name="location" id="edit_location" >
                 </div>
 
                 <div class="form-row">

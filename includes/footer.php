@@ -41,7 +41,7 @@
 
     </div>
     <hr>
-    <p class="copyright">Copyright | JobPortal @ 2025 | All Rights Reserved</p>
+    <p class="copyright">Copyright | JobPortal @ 2026 | All Rights Reserved</p>
 </footer>
 
 <style>

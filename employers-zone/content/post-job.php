@@ -1,3 +1,156 @@
+<?php
+include __DIR__ . '/../../config/db.php';
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+$errors = [];
+$success = "";
+
+if (!isset($_SESSION['EMPLOYER_ID'])) {
+    die("<p style='color:red; text-align:center'>You must be logged in to post a job.</p>");
+}
+
+$employer_id = $_SESSION['EMPLOYER_ID'];
+
+$title = "";
+$location = "";
+$description = "";
+$minExperience = "";
+$maxExperience = "";
+$degree = "";
+$expiryDate = "";
+$category = "";
+$jobType = "";
+$jobLevel = "";
+$minSalary = "";
+$maxSalary = "";
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    // Collect form data safely
+    $title = trim($_POST['title'] ?? '');
+    $location = trim($_POST['location'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $minExperience = trim($_POST['experience_min'] ?? '');
+    $maxExperience = trim($_POST['experience_max'] ?? '');
+    $degree = trim($_POST['degree'] ?? '');
+    $expiryDate = trim($_POST['expiry_date'] ?? '');
+    $category = trim($_POST['category'] ?? '');
+    $jobType = trim($_POST['job_type'] ?? '');
+    $jobLevel = trim($_POST['job_level'] ?? '');
+    $minSalary = trim($_POST['salary_min'] ?? '');
+    $maxSalary = trim($_POST['salary_max'] ?? '');
+
+    if ($title === "") {
+        $errors[] = "Job title is required.";
+    }
+
+    if ($location === "") {
+        $errors[] = "Location is required.";
+    }
+
+    if ($category === "") {
+        $errors[] = "Job category is required.";
+    }
+
+    if ($jobType === "") {
+        $errors[] = "Job type is required.";
+    }
+
+    if ($jobLevel === "") {
+        $errors[] = "Job level is required.";
+    }
+
+    if ($expiryDate === "") {
+        $errors[] = "Expiry date is required.";
+    }
+
+    if (strip_tags($description) === "") {
+        $errors[] = "Job description cannot be empty.";
+    }
+
+    // Validate numeric fields
+    if ($minExperience !== "" && !is_numeric($minExperience)) {
+        $errors[] = "Minimum experience must be a number.";
+    }
+
+    if ($maxExperience !== "" && !is_numeric($maxExperience)) {
+        $errors[] = "Maximum experience must be a number.";
+    }
+
+    if ($minExperience !== "" && $maxExperience !== "" && $minExperience > $maxExperience) {
+        $errors[] = "Minimum experience cannot be greater than maximum experience.";
+    }
+
+    if ($minSalary !== "" && !is_numeric($minSalary)) {
+        $errors[] = "Minimum salary must be numeric.";
+    }
+
+    if ($maxSalary !== "" && !is_numeric($maxSalary)) {
+        $errors[] = "Maximum salary must be numeric.";
+    }
+
+    if ($minSalary !== "" && $maxSalary !== "" && $minSalary > $maxSalary) {
+        $errors[] = "Minimum salary cannot be greater than maximum salary.";
+    }
+
+    if ($expiryDate !== "" && strtotime($expiryDate) < strtotime(date("Y-m-d"))) {
+        $errors[] = "Expiry date must be a future date.";
+    }
+
+    if (empty($errors)) {
+        $stmt = $conn->prepare("INSERT INTO jobs 
+            (title, description, location, salary_min, salary_max, experience_min, experience_max, expiry_date, degree, job_type, job_level, category, employer_id) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        if ($stmt === false) {
+            $errors[] = "Database prepare error: " . $conn->error;
+        } else {
+            $stmt->bind_param(
+                "sssddddsssssi",
+                $title,
+                $description,
+                $location,
+                $minSalary,
+                $maxSalary,
+                $minExperience,
+                $maxExperience,
+                $expiryDate,
+                $degree,
+                $jobType,
+                $jobLevel,
+                $category,
+                $employer_id
+            );
+
+            if ($stmt->execute()) {
+                $success = "New Job Posted Successfully";
+
+                // Reset form values
+                $title = "";
+                $location = "";
+                $description = "";
+                $minExperience = "";
+                $maxExperience = "";
+                $degree = "";
+                $expiryDate = "";
+                $category = "";
+                $jobType = "";
+                $jobLevel = "";
+                $minSalary = "";
+                $maxSalary = "";
+            } else {
+                $errors[] = "Database error: " . $stmt->error;
+            }
+
+            $stmt->close();
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -265,6 +418,7 @@
     ?>
 
     <div class="form-container">
+
         <div class="title-card">
             <div class="title">
                 <h2>Post a Job</h2>
@@ -275,16 +429,29 @@
                 preview
             </div>
         </div>
-        <form action="" id="jobForm" method="POST"> <!-- Added ID for easy JS targeting -->
+        <?php if (!empty($errors)) : ?>
+            <div style="color:red; text-align:center; margin-bottom:1rem;">
+                <?php foreach ($errors as $error) : ?>
+                    <p><?php echo htmlspecialchars($error); ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($success)) : ?>
+            <div style="color:green; text-align:center; margin-bottom:1rem;">
+                <p><?php echo htmlspecialchars($success); ?></p>
+            </div>
+        <?php endif; ?>
+
+        <form action="" id="jobForm" method="POST">
             <label for="title">Job Title</label>
-            <input type="text" id="title" name="title" placeholder="Enter job title" required>
+            <input type="text" id="title" name="title" placeholder="Enter job title" value="<?php echo htmlspecialchars($title ?? ''); ?>">
 
             <label for="location">Location</label>
-            <input type="text" name="location" id="location" placeholder="Enter job location" required>
+            <input type="text" name="location" id="location" placeholder="Enter job location" value="<?php echo htmlspecialchars($location ?? ''); ?>">
 
             <!-- Description Section -->
             <label for="description">Job Description</label>
-            <!-- Custom Toolbar HTML (populated by Quill) -->
             <div id="toolbar">
                 <span class="ql-formats">
                     <button class="ql-bold" title="Bold"></button>
@@ -294,7 +461,7 @@
                 <span class="ql-formats">
                     <select class="ql-size" title="Font Size">
                         <option value="small">Small</option>
-                        <option selected value="">Normal</option>
+                        <option value="" <?php if (empty($description)) echo 'selected'; ?>>Normal</option>
                         <option value="large">Large</option>
                         <option value="huge">Huge</option>
                     </select>
@@ -304,102 +471,71 @@
                     <button class="ql-list" value="bullet" title="Bullet List"></button>
                 </span>
             </div>
-            <div id="editor"></div>
+            <div id="editor"><?php echo $description ?? ''; ?></div>
             <input type="hidden" name="description" id="description">
 
             <label for="min-experience">Minimum Experience</label>
-            <input type="text" id="min-experience" name="experience_min" placeholder="Enter minimum experience (years)"> <!-- Fixed placeholder -->
+            <input type="text" id="min-experience" name="experience_min" placeholder="Enter minimum experience (years)" value="<?php echo htmlspecialchars($minExperience ?? ''); ?>">
 
             <label for="max-experience">Maximum Experience</label>
-            <input type="text" id="max-experience" name="experience_max" placeholder="Enter maximum experience (years)"> <!-- Fixed placeholder -->
+            <input type="text" id="max-experience" name="experience_max" placeholder="Enter maximum experience (years)" value="<?php echo htmlspecialchars($maxExperience ?? ''); ?>">
 
             <label for="degree">Degree</label>
-            <input type="text" name="degree" id="degree" placeholder="Enter required degree">
+            <input type="text" name="degree" id="degree" placeholder="Enter required degree" value="<?php echo htmlspecialchars($degree ?? ''); ?>">
 
             <label for="expiry-date">Expiry Date</label>
-            <input type="date" name="expiry_date" id="expiry-date" required>
+            <input type="date" name="expiry_date" id="expiry-date" value="<?php echo htmlspecialchars($expiryDate ?? ''); ?>" >
 
             <label for="category">Job Category</label>
-            <select id="category" name="category" required>
-                <option value="" selected>-- Select Category --</option>
-                <option value="it_software">IT & Software</option>
-                <option value="web_dev">Web Development</option>
-                <option value="design">Design & Creative</option>
-                <option value="marketing">Marketing & Sales</option>
-                <option value="finance">Finance & Accounting</option>
-                <option value="hr">Human Resources</option>
-                <option value="education">Education & Training</option>
-                <option value="healthcare">Healthcare</option>
-                <option value="engineering">Engineering</option>
-                <option value="customer_service">Customer Service</option>
-                <option value="management">Management</option>
-                <option value="writing">Writing & Translation</option>
-                <option value="data_entry">Data Entry</option>
-                <option value="legal">Legal</option>
-                <option value="others">Others</option>
+            <select id="category" name="category" >
+                <option value="">-- Select Category --</option>
+                <option value="it_software" <?php if (($category ?? '') === 'it_software') echo 'selected'; ?>>IT & Software</option>
+                <option value="web_dev" <?php if (($category ?? '') === 'web_dev') echo 'selected'; ?>>Web Development</option>
+                <option value="design" <?php if (($category ?? '') === 'design') echo 'selected'; ?>>Design & Creative</option>
+                <option value="marketing" <?php if (($category ?? '') === 'marketing') echo 'selected'; ?>>Marketing & Sales</option>
+                <option value="finance" <?php if (($category ?? '') === 'finance') echo 'selected'; ?>>Finance & Accounting</option>
+                <option value="hr" <?php if (($category ?? '') === 'hr') echo 'selected'; ?>>Human Resources</option>
+                <option value="education" <?php if (($category ?? '') === 'education') echo 'selected'; ?>>Education & Training</option>
+                <option value="healthcare" <?php if (($category ?? '') === 'healthcare') echo 'selected'; ?>>Healthcare</option>
+                <option value="engineering" <?php if (($category ?? '') === 'engineering') echo 'selected'; ?>>Engineering</option>
+                <option value="customer_service" <?php if (($category ?? '') === 'customer_service') echo 'selected'; ?>>Customer Service</option>
+                <option value="management" <?php if (($category ?? '') === 'management') echo 'selected'; ?>>Management</option>
+                <option value="writing" <?php if (($category ?? '') === 'writing') echo 'selected'; ?>>Writing & Translation</option>
+                <option value="data_entry" <?php if (($category ?? '') === 'data_entry') echo 'selected'; ?>>Data Entry</option>
+                <option value="legal" <?php if (($category ?? '') === 'legal') echo 'selected'; ?>>Legal</option>
+                <option value="others" <?php if (($category ?? '') === 'others') echo 'selected'; ?>>Others</option>
             </select>
 
             <label for="job-type">Job Type</label>
-            <select name="job_type" id="job_type" required>
-                <option value="" selected>-- Select job type --</option>
-                <option value="Full time">Full time</option>
-                <option value="Part time">Part time</option>
-                <option value="Internship">Internship</option>
-                <option value="Remote">Remote</option>
-                <option value="Contract">Contract</option>
+            <select name="job_type" id="job_type" >
+                <option value="">-- Select job type --</option>
+                <option value="Full time" <?php if (($jobType ?? '') === 'Full time') echo 'selected'; ?>>Full time</option>
+                <option value="Part time" <?php if (($jobType ?? '') === 'Part time') echo 'selected'; ?>>Part time</option>
+                <option value="Internship" <?php if (($jobType ?? '') === 'Internship') echo 'selected'; ?>>Internship</option>
+                <option value="Remote" <?php if (($jobType ?? '') === 'Remote') echo 'selected'; ?>>Remote</option>
+                <option value="Contract" <?php if (($jobType ?? '') === 'Contract') echo 'selected'; ?>>Contract</option>
             </select>
 
             <label for="job-level">Job Level</label>
-            <select name="job_level" id="job_level" required>
-                <option value="" selected>-- Select job level --</option>
-                <option value="Entry">Entry level</option>
-                <option value="Junior">Junior level</option>
-                <option value="Mid">Mid level</option>
-                <option value="Senior">Senior level</option>
+            <select name="job_level" id="job_level" >
+                <option value="">-- Select job level --</option>
+                <option value="Entry" <?php if (($jobLevel ?? '') === 'Entry') echo 'selected'; ?>>Entry level</option>
+                <option value="Junior" <?php if (($jobLevel ?? '') === 'Junior') echo 'selected'; ?>>Junior level</option>
+                <option value="Mid" <?php if (($jobLevel ?? '') === 'Mid') echo 'selected'; ?>>Mid level</option>
+                <option value="Senior" <?php if (($jobLevel ?? '') === 'Senior') echo 'selected'; ?>>Senior level</option>
             </select>
 
             <label for="min-salary">Minimum Salary</label>
-            <input type="text" name="salary_min" id="min-salary" placeholder="Enter minimum salary">
+            <input type="text" name="salary_min" id="min-salary" placeholder="Enter minimum salary" value="<?php echo htmlspecialchars($minSalary ?? ''); ?>">
 
             <label for="max-salary">Maximum Salary</label>
-            <input type="text" name="salary_max" id="max-salary" placeholder="Enter maximum salary">
+            <input type="text" name="salary_max" id="max-salary" placeholder="Enter maximum salary" value="<?php echo htmlspecialchars($maxSalary ?? ''); ?>">
 
-            <button type="submit" class="btn btn-primary btn-lg">Post Job</button> <!-- Fixed: No <a> tag, added type="submit" -->
+            <button type="submit" class="btn btn-primary btn-lg">Post Job</button>
         </form>
+
+
     </div>
-
-    <?php
-    if ($_SERVER["REQUEST_METHOD"] == 'POST') {
-        $title = mysqli_real_escape_string($conn, $_POST["title"]);
-        $location = mysqli_real_escape_string($conn, $_POST["location"]);
-        $description = mysqli_real_escape_string($conn, $_POST["description"]);
-        $minExperience = mysqli_real_escape_string($conn, $_POST["experience_min"]);
-        $maxExperience = mysqli_real_escape_string($conn, $_POST["experience_max"]);
-        $degree = mysqli_real_escape_string($conn, $_POST["degree"]);
-        $expiryDate = mysqli_real_escape_string($conn, $_POST["expiry_date"]);
-        $category = mysqli_real_escape_string($conn, $_POST["category"]);
-        $jobType = mysqli_real_escape_string($conn, $_POST["job_type"]);
-        $jobLevel = mysqli_real_escape_string($conn, $_POST["job_level"]);
-        $minSalary = mysqli_real_escape_string($conn, $_POST["salary_min"]);
-        $maxSalary = mysqli_real_escape_string($conn, $_POST["salary_max"]);
-
-        $sql = "INSERT INTO jobs 
-        (title, description, location, salary_min, salary_max, experience_min, experience_max, expiry_date, degree, job_type, job_level, category, employer_id) 
-        VALUES ('$title','$description','$location', '$minSalary', '$maxSalary', '$minExperience', '$maxExperience', '$expiryDate', '$degree', '$jobType', '$jobLevel', '$category', '$employer_id')";
-
-
-
-        if (mysqli_query($conn, $sql)) {
-            echo "<p style='color:green; text-align:center'>New Job Posted</p>";
-        } else {
-            echo "<p style='color:red;'>Error Job Posting: " . mysqli_error($conn) . "</p>";
-        }
-
-        mysqli_close($conn);
-    }
-
-    ?>
-
     <script>
         const form = document.getElementById('jobForm');
         const quill = new Quill('#editor', {
@@ -410,13 +546,15 @@
             theme: "snow"
         });
 
+        // Load existing description content if available
+        <?php if (!empty($description)) : ?>
+            quill.root.innerHTML = <?php echo json_encode($description); ?>;
+        <?php endif; ?>
+
         form.addEventListener('submit', function(e) {
-            e.preventDefault();
             document.getElementById('description').value = quill.root.innerHTML;
-            form.submit();
         });
     </script>
-
 </body>
 
 </html>

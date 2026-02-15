@@ -35,12 +35,13 @@ if (!$result || mysqli_num_rows($result) === 0) {
 }
 
 $row = mysqli_fetch_assoc($result);
-function e($s) { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
+function e($s)
+{
+    return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+}
 
-$profileImg = $row['profile'] 
-    ? "/uploads/".rawurlencode($row['profile']) 
-    : "/assets/default-avatar.png";
-$resumePath = $row['resume'] ? "../../uploads/".rawurlencode($row['resume']) : '#';
+$profileImg = $row['profile'];
+$resumePath = $row['resume'] ? "../uploads/" . rawurlencode($row['resume']) : '#';
 $status = e($row['status']);
 $appliedAt = date('jS M Y', strtotime($row['applied_at'] ?? 'now'));
 $jobTitle = e($row['job_title']);
@@ -53,7 +54,7 @@ $appId = intval($row['application_id']);
 
 <div class="app-profile-container">
     <div class="profile-top">
-        <img src="default-avatar.png" alt="Profile" class="profile-photo">
+        <img src="<?php echo "../uploads/$profileImg"; ?>" alt="Profile" class="profile-photo">
         <h3 class="applicant-name"><?php echo $name; ?></h3>
         <p class="applicant-email"><?php echo $email; ?></p>
     </div>
@@ -87,11 +88,11 @@ $appId = intval($row['application_id']);
     <div class="change-status-box">
         <label>Change Application Status</label>
         <select id="changeStatus" class="status-select">
-            <option value="applied" <?php if($status=='Applied') echo 'selected'; ?>>Applied</option>
-            <option value="reviewed" <?php if($status=='Reviewed') echo 'selected'; ?>>Reviewed</option>
-            <option value="shortlisted" <?php if($status=='Shortlisted') echo 'selected'; ?>>Shortlisted</option>
-            <option value="rejected" <?php if($status=='Rejected') echo 'selected'; ?>>Rejected</option>
-            <option value="selected" <?php if($status=='Selected') echo 'selected'; ?>>Selected</option>
+            <option value="applied" <?php if ($status == 'Applied') echo 'selected'; ?>>Applied</option>
+            <option value="reviewed" <?php if ($status == 'Reviewed') echo 'selected'; ?>>Reviewed</option>
+            <option value="shortlisted" <?php if ($status == 'Shortlisted') echo 'selected'; ?>>Shortlisted</option>
+            <option value="rejected" <?php if ($status == 'Rejected') echo 'selected'; ?>>Rejected</option>
+            <option value="selected" <?php if ($status == 'Selected') echo 'selected'; ?>>Selected</option>
         </select>
 
         <button class="update-btn" onclick="updateStatus(<?php echo $appId; ?>)">Update</button>
