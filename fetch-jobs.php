@@ -49,7 +49,9 @@ $date_posted = $_POST['date_posted'] ?? [];
 $sql = "SELECT j.*, e.name AS company_name, e.logo AS company_logo
         FROM jobs j
         INNER JOIN employers e ON j.employer_id = e.id
-        WHERE j.status='active'";
+        WHERE j.status='active'
+        ";
+        // AND (j.expiry_date IS NULL OR j.expiry_date >= CURDATE())
 
 /* ---------- APPLY FILTERS ---------- */
 if (!empty($search)) {

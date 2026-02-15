@@ -1,0 +1,26 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+
+# Logs & temp
+*.log
+tmp/
+cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Dependencies
+node_modules/
+vendor/
+
+# Backups
+*.bak
+*.old

@@ -2,7 +2,7 @@
 <?php 
 $servername = "localhost";
 $username = "root";
-$password = "";
+$password = "sarun@sql789";
 $dbName = "job_portal";
 
 //create connnection

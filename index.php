@@ -27,11 +27,6 @@ include './config/db.php'
     <style>
     </style>
 </head>
-
-<style>
-
-</style>
-
 <body>
     
 
@@ -52,7 +47,7 @@ include './config/db.php'
         </h2>
         <h1>Search, Apply & <br> Get Your <span class="gradient-text">Dream Job</span></h1>
         <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores tenetur sunt quidem? Aliquam architecto nulla, esse quas quibusdam culpa ullam, quidem placeat doloremque alias at, quis repellat nisi animi! Necessitatibus.
+            Find jobs that match your skills and interests. Discover trusted employers, apply easily, and build your career with confidence. Start your journey toward a better future today.
         </p>
 
         <div class="container-btns">
